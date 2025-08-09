@@ -14,16 +14,212 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      credit_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          direction: Database["public"]["Enums"]["tx_direction"]
+          feedback_id: string | null
+          id: string
+          metadata: Json
+          reason: Database["public"]["Enums"]["tx_reason"]
+          test_id: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          direction: Database["public"]["Enums"]["tx_direction"]
+          feedback_id?: string | null
+          id?: string
+          metadata?: Json
+          reason: Database["public"]["Enums"]["tx_reason"]
+          test_id?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          direction?: Database["public"]["Enums"]["tx_direction"]
+          feedback_id?: string | null
+          id?: string
+          metadata?: Json
+          reason?: Database["public"]["Enums"]["tx_reason"]
+          test_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credit_transactions_feedback_id_fkey"
+            columns: ["feedback_id"]
+            isOneToOne: false
+            referencedRelation: "feedbacks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "credit_transactions_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "test_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      feedbacks: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          rating: number | null
+          status: Database["public"]["Enums"]["feedback_status"]
+          test_id: string
+          tester_id: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          rating?: number | null
+          status?: Database["public"]["Enums"]["feedback_status"]
+          test_id: string
+          tester_id: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          rating?: number | null
+          status?: Database["public"]["Enums"]["feedback_status"]
+          test_id?: string
+          tester_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedbacks_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "test_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          credits_balance: number
+          display_name: string | null
+          id: string
+          interests: string[] | null
+          skills: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          credits_balance?: number
+          display_name?: string | null
+          id: string
+          interests?: string[] | null
+          skills?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          credits_balance?: number
+          display_name?: string | null
+          id?: string
+          interests?: string[] | null
+          skills?: string[] | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      test_requests: {
+        Row: {
+          created_at: string
+          goals: string | null
+          id: string
+          link: string
+          nda: boolean
+          owner_id: string
+          reward: number
+          status: Database["public"]["Enums"]["test_status"]
+          time_required: number
+          title: string
+          type: Database["public"]["Enums"]["project_type"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          goals?: string | null
+          id?: string
+          link: string
+          nda?: boolean
+          owner_id: string
+          reward: number
+          status?: Database["public"]["Enums"]["test_status"]
+          time_required: number
+          title: string
+          type: Database["public"]["Enums"]["project_type"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          goals?: string | null
+          id?: string
+          link?: string
+          nda?: boolean
+          owner_id?: string
+          reward?: number
+          status?: Database["public"]["Enums"]["test_status"]
+          time_required?: number
+          title?: string
+          type?: Database["public"]["Enums"]["project_type"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      adjust_user_credits: {
+        Args: { _user_id: string; _delta: number }
+        Returns: undefined
+      }
+      log_credit_tx: {
+        Args: {
+          _user_id: string
+          _amount: number
+          _direction: Database["public"]["Enums"]["tx_direction"]
+          _reason: Database["public"]["Enums"]["tx_reason"]
+          _test_id?: string
+          _feedback_id?: string
+          _metadata?: Json
+        }
+        Returns: undefined
+      }
     }
     Enums: {
-      [_ in never]: never
+      feedback_status: "submitted" | "approved" | "rejected"
+      project_type: "Website" | "App" | "Service Flow" | "Other"
+      test_status: "active" | "closed"
+      tx_direction: "debit" | "credit"
+      tx_reason:
+        | "post_test"
+        | "feedback_approved"
+        | "purchase"
+        | "refund"
+        | "admin_adjust"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +346,18 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      feedback_status: ["submitted", "approved", "rejected"],
+      project_type: ["Website", "App", "Service Flow", "Other"],
+      test_status: ["active", "closed"],
+      tx_direction: ["debit", "credit"],
+      tx_reason: [
+        "post_test",
+        "feedback_approved",
+        "purchase",
+        "refund",
+        "admin_adjust",
+      ],
+    },
   },
 } as const
