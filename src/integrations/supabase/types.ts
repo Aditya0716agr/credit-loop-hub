@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      badges: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       credit_transactions: {
         Row: {
           amount: number
@@ -53,7 +74,7 @@ export type Database = {
             foreignKeyName: "credit_transactions_feedback_id_fkey"
             columns: ["feedback_id"]
             isOneToOne: false
-            referencedRelation: "feedbacks"
+            referencedRelation: "submissions"
             referencedColumns: ["id"]
           },
           {
@@ -65,46 +86,32 @@ export type Database = {
           },
         ]
       }
-      feedbacks: {
+      notifications: {
         Row: {
-          content: string
           created_at: string
           id: string
-          rating: number | null
-          status: Database["public"]["Enums"]["feedback_status"]
-          test_id: string
-          tester_id: string
-          updated_at: string
+          payload: Json
+          read: boolean
+          type: string
+          user_id: string
         }
         Insert: {
-          content: string
           created_at?: string
           id?: string
-          rating?: number | null
-          status?: Database["public"]["Enums"]["feedback_status"]
-          test_id: string
-          tester_id: string
-          updated_at?: string
+          payload?: Json
+          read?: boolean
+          type: string
+          user_id: string
         }
         Update: {
-          content?: string
           created_at?: string
           id?: string
-          rating?: number | null
-          status?: Database["public"]["Enums"]["feedback_status"]
-          test_id?: string
-          tester_id?: string
-          updated_at?: string
+          payload?: Json
+          read?: boolean
+          type?: string
+          user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "feedbacks_test_id_fkey"
-            columns: ["test_id"]
-            isOneToOne: false
-            referencedRelation: "test_requests"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -112,6 +119,7 @@ export type Database = {
           bio: string | null
           created_at: string
           credits_balance: number
+          credits_locked: number
           display_name: string | null
           id: string
           interests: string[] | null
@@ -123,6 +131,7 @@ export type Database = {
           bio?: string | null
           created_at?: string
           credits_balance?: number
+          credits_locked?: number
           display_name?: string | null
           id: string
           interests?: string[] | null
@@ -134,6 +143,7 @@ export type Database = {
           bio?: string | null
           created_at?: string
           credits_balance?: number
+          credits_locked?: number
           display_name?: string | null
           id?: string
           interests?: string[] | null
@@ -142,12 +152,65 @@ export type Database = {
         }
         Relationships: []
       }
+      submissions: {
+        Row: {
+          attachments: Json
+          content: string
+          created_at: string
+          device_fingerprint: string | null
+          id: string
+          ip_address: string | null
+          rating: number | null
+          status: Database["public"]["Enums"]["feedback_status"]
+          test_id: string
+          tester_id: string
+          updated_at: string
+        }
+        Insert: {
+          attachments?: Json
+          content: string
+          created_at?: string
+          device_fingerprint?: string | null
+          id?: string
+          ip_address?: string | null
+          rating?: number | null
+          status?: Database["public"]["Enums"]["feedback_status"]
+          test_id: string
+          tester_id: string
+          updated_at?: string
+        }
+        Update: {
+          attachments?: Json
+          content?: string
+          created_at?: string
+          device_fingerprint?: string | null
+          id?: string
+          ip_address?: string | null
+          rating?: number | null
+          status?: Database["public"]["Enums"]["feedback_status"]
+          test_id?: string
+          tester_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "submissions_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "test_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       test_requests: {
         Row: {
           created_at: string
+          deadline: string | null
           goals: string | null
           id: string
           link: string
+          locked_remaining: number
+          max_testers: number
           nda: boolean
           owner_id: string
           reward: number
@@ -159,9 +222,12 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          deadline?: string | null
           goals?: string | null
           id?: string
           link: string
+          locked_remaining?: number
+          max_testers?: number
           nda?: boolean
           owner_id: string
           reward: number
@@ -173,9 +239,12 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          deadline?: string | null
           goals?: string | null
           id?: string
           link?: string
+          locked_remaining?: number
+          max_testers?: number
           nda?: boolean
           owner_id?: string
           reward?: number
@@ -187,9 +256,46 @@ export type Database = {
         }
         Relationships: []
       }
+      user_badges: {
+        Row: {
+          awarded_at: string
+          badge_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          awarded_at?: string
+          badge_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          awarded_at?: string
+          badge_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_badges_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "badges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
-      [_ in never]: never
+      leaderboard_weekly: {
+        Row: {
+          credits_earned: number | null
+          first_earn: string | null
+          last_earn: string | null
+          tester_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       adjust_user_credits: {
@@ -206,6 +312,10 @@ export type Database = {
           _feedback_id?: string
           _metadata?: Json
         }
+        Returns: undefined
+      }
+      notify: {
+        Args: { _user_id: string; _type: string; _payload: Json }
         Returns: undefined
       }
     }
