@@ -6,7 +6,7 @@ import BuyCreditsModal from "@/components/credits/BuyCreditsModal";
 import { useState } from "react";
 
 const Header = () => {
-  const { user, credits, loginDemo, logout } = useApp();
+  const { user, credits, logout } = useApp();
   const [buyOpen, setBuyOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -30,7 +30,7 @@ const Header = () => {
               <Button variant="outline" onClick={logout}>Logout</Button>
             </>
           ) : (
-            <Button onClick={loginDemo}>Login</Button>
+            <Button onClick={() => navigate('/auth')}>Login</Button>
           )}
         </div>
       </div>

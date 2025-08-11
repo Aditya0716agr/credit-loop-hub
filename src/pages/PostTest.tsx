@@ -23,9 +23,9 @@ const PostTest = () => {
   const [link, setLink] = useState("");
   const [nda, setNda] = useState(false);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = postTest({ title, type, goals, timeRequired, reward, link, nda });
+    const res = await postTest({ title, type, goals, timeRequired, reward, link, nda });
     if (res) navigate(`/test/${res.id}`);
     else if (reward > credits) setBuyOpen(true);
   };

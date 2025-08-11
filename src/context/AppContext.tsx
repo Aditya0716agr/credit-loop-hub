@@ -1,15 +1,16 @@
-import React, { createContext, useContext, useMemo, useState } from "react";
-import { toast } from "@/hooks/use-toast";
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/components/ui/sonner";
 
 export type ProjectType = "Website" | "App" | "Service Flow" | "Other";
 
-export interface User {
+export interface UserProfile {
   id: string;
-  name: string;
-  avatarUrl?: string;
-  bio?: string;
-  skills?: string[];
-  interests?: string[];
+  name?: string | null;
+  avatarUrl?: string | null;
+  bio?: string | null;
+  skills?: string[] | null;
+  interests?: string[] | null;
 }
 
 export interface TestRequest {
@@ -37,162 +38,175 @@ export interface Feedback {
 }
 
 interface AppContextValue {
-  user?: User;
+  user?: UserProfile;
   credits: number;
   tests: TestRequest[];
   feedbacks: Feedback[];
-  loginDemo: () => void;
-  logout: () => void;
-  addCredits: (amount: number) => void;
-  deductCredits: (amount: number) => boolean;
-  postTest: (input: Omit<TestRequest, "id" | "ownerId" | "createdAt" | "status">) => TestRequest | null;
-  submitFeedback: (testId: string, content: string, rating?: number) => Feedback | null;
-  approveFeedback: (feedbackId: string) => void;
+  logout: () => Promise<void>;
+  postTest: (input: Omit<TestRequest, "id" | "ownerId" | "createdAt" | "status">) => Promise<TestRequest | null>;
+  submitFeedback: (testId: string, content: string, rating?: number) => Promise<Feedback | null>;
+  approveFeedback: (feedbackId: string) => Promise<void>;
+  refreshProfile: () => Promise<void>;
 }
 
 const AppContext = createContext<AppContextValue | undefined>(undefined);
 
-function genId(prefix = "id") {
-  return `${prefix}_${Math.random().toString(36).slice(2, 8)}${Date.now().toString(36)}`;
-}
-
-const seedOwner: User = { id: "user-seed", name: "Seed Founder" };
-
-const seedTests: TestRequest[] = [
-  {
-    id: genId("t"),
-    title: "Landing Page Clarity Check",
-    type: "Website",
-    goals: "Is the value proposition clear within 5 seconds?",
-    timeRequired: 5,
-    reward: 2,
-    link: "https://example.com",
-    nda: false,
-    ownerId: seedOwner.id,
-    createdAt: new Date().toISOString(),
-    status: "active",
-  },
-  {
-    id: genId("t"),
-    title: "Mobile Onboarding Flow",
-    type: "App",
-    goals: "Find onboarding friction in 3 steps.",
-    timeRequired: 10,
-    reward: 4,
-    link: "https://example.com/app",
-    nda: false,
-    ownerId: seedOwner.id,
-    createdAt: new Date().toISOString(),
-    status: "active",
-  },
-  {
-    id: genId("t"),
-    title: "Checkout Usability",
-    type: "Service Flow",
-    goals: "Complete a sample checkout and rate ease.",
-    timeRequired: 15,
-    reward: 6,
-    link: "https://example.com/shop",
-    nda: true,
-    ownerId: seedOwner.id,
-    createdAt: new Date().toISOString(),
-    status: "active",
-  },
-];
-
 export const AppProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
-  const [user, setUser] = useState<User | undefined>();
+  const [user, setUser] = useState<UserProfile | undefined>();
   const [credits, setCredits] = useState<number>(0);
-  const [tests, setTests] = useState<TestRequest[]>(seedTests);
+  const [tests, setTests] = useState<TestRequest[]>([]);
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
 
-  const loginDemo = () => {
-    const demo: User = { id: "user-demo", name: "Demo User" };
-    setUser(demo);
-    setCredits((c) => (c > 0 ? c : 10)); // 10 free credits on first sign-in
-    toast({ title: "Signed in", description: "Welcome to IdeaSoop Beta Hub." });
-  };
+  const mapTest = (r: any): TestRequest => ({
+    id: r.id,
+    title: r.title,
+    type: r.type,
+    goals: r.goals ?? "",
+    timeRequired: r.time_required as 5 | 10 | 15 | 30,
+    reward: r.reward,
+    link: r.link,
+    nda: r.nda,
+    ownerId: r.owner_id,
+    createdAt: r.created_at,
+    status: r.status,
+  });
 
-  const logout = () => {
-    setUser(undefined);
-    toast({ title: "Signed out" });
-  };
+  const mapFeedback = (r: any): Feedback => ({
+    id: r.id,
+    testId: r.test_id,
+    testerId: r.tester_id,
+    content: r.content,
+    rating: r.rating ?? undefined,
+    status: r.status,
+    createdAt: r.created_at,
+  });
 
-  const addCredits = (amount: number) => setCredits((c) => c + amount);
-
-  const deductCredits = (amount: number) => {
-    if (credits < amount) return false;
-    setCredits((c) => c - amount);
-    return true;
-  };
-
-  const postTest: AppContextValue["postTest"] = (input) => {
-    if (!user) {
-      toast({ title: "Please sign in", description: "Sign in to post a test." });
-      return null;
+  const fetchProfile = async (uid: string) => {
+    const { data } = await supabase.from("profiles").select("id, display_name, avatar_url, bio, skills, interests, credits_balance").eq("id", uid).maybeSingle();
+    if (data) {
+      setUser({ id: data.id, name: data.display_name, avatarUrl: data.avatar_url, bio: data.bio, skills: data.skills, interests: data.interests });
+      setCredits(data.credits_balance ?? 0);
+    } else {
+      setUser(undefined);
+      setCredits(0);
     }
-    if (input.reward < 2) {
-      toast({ title: "Minimum reward is 2 credits" });
-      return null;
-    }
-    if (!deductCredits(input.reward)) {
-      toast({
-        title: "Not enough credits",
-        description: "Buy credits to post this test.",
+  };
+
+  const fetchTests = async () => {
+    const { data, error } = await supabase.from("test_requests").select("*").order("created_at", { ascending: false });
+    if (!error && data) setTests(data.map(mapTest));
+  };
+
+  const fetchMyFeedbacks = async (uid?: string) => {
+    if (!uid) { setFeedbacks([]); return; }
+    const { data, error } = await supabase.from("submissions").select("*").eq("tester_id", uid).order("created_at", { ascending: false });
+    if (!error && data) setFeedbacks(data.map(mapFeedback));
+  };
+
+  useEffect(() => {
+    const init = async () => {
+      // Set up listener first
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_evt, session) => {
+        const uid = session?.user?.id;
+        if (uid) {
+          setTimeout(() => { fetchProfile(uid); fetchMyFeedbacks(uid); }, 0);
+        } else {
+          setUser(undefined);
+          setCredits(0);
+          setFeedbacks([]);
+        }
       });
-      return null;
-    }
-    const newTest: TestRequest = {
-      id: genId("t"),
-      ownerId: user.id,
-      createdAt: new Date().toISOString(),
-      status: "active",
-      ...input,
+      // Then get current session
+      const { data: s } = await supabase.auth.getSession();
+      const uid = s.session?.user?.id;
+      if (uid) {
+        await fetchProfile(uid);
+        await fetchMyFeedbacks(uid);
+      }
+      await fetchTests();
+      return () => subscription.unsubscribe();
     };
-    setTests((arr) => [newTest, ...arr]);
-    toast({ title: "Test posted", description: `${input.title} is now live.` });
-    return newTest;
+    init();
+
+    // Realtime for tests (optional)
+    const channel = supabase
+      .channel('public:test_requests')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'test_requests' }, () => {
+        fetchTests();
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, []);
+
+  const logout = async () => {
+    await supabase.auth.signOut();
+    toast("Signed out");
   };
 
-  const submitFeedback: AppContextValue["submitFeedback"] = (testId, content, rating) => {
-    if (!user) {
-      toast({ title: "Please sign in", description: "Sign in to submit feedback." });
+  const postTest: AppContextValue["postTest"] = async (input) => {
+    const { data: s } = await supabase.auth.getSession();
+    const uid = s.session?.user?.id;
+    if (!uid) { toast.error("Please sign in to post a test"); return null; }
+
+    const insert = {
+      title: input.title,
+      type: input.type,
+      goals: input.goals,
+      time_required: input.timeRequired,
+      reward: input.reward,
+      link: input.link,
+      nda: !!input.nda,
+      owner_id: uid,
+      max_testers: 1,
+    };
+
+    const { data, error } = await supabase.from("test_requests").insert(insert).select("*").maybeSingle();
+    if (error || !data) {
+      toast.error(error?.message || "Failed to post test");
       return null;
     }
-    const fb: Feedback = {
-      id: genId("fb"),
-      testId,
-      testerId: user.id,
+    const t = mapTest(data);
+    setTests((arr) => [t, ...arr]);
+    toast.success("Test posted");
+    return t;
+  };
+
+  const submitFeedback: AppContextValue["submitFeedback"] = async (testId, content, rating) => {
+    const { data: s } = await supabase.auth.getSession();
+    const uid = s.session?.user?.id;
+    if (!uid) { toast.error("Please sign in to submit feedback"); return null; }
+
+    const { data, error } = await supabase.from("submissions").insert({
+      test_id: testId,
+      tester_id: uid,
       content,
-      rating,
-      status: "submitted",
-      createdAt: new Date().toISOString(),
-    };
+      rating: rating ?? null,
+    }).select("*").maybeSingle();
+
+    if (error || !data) {
+      toast.error(error?.message || "Submission failed");
+      return null;
+    }
+    const fb = mapFeedback(data);
     setFeedbacks((arr) => [fb, ...arr]);
-    toast({ title: "Feedback submitted", description: "Awaiting requester approval." });
+    toast.success("Feedback submitted");
     return fb;
   };
 
-  const approveFeedback = (feedbackId: string) => {
-    const fb = feedbacks.find((f) => f.id === feedbackId);
-    if (!fb) return;
-    const test = tests.find((t) => t.id === fb.testId);
-    if (!test) return;
-    if (user?.id !== test.ownerId) {
-      toast({ title: "Only the requester can approve feedback" });
-      return;
-    }
-    setFeedbacks((arr) => arr.map((f) => (f.id === feedbackId ? { ...f, status: "approved" } : f)));
-    // Transfer credits: reward goes to tester (already deducted from owner at post time)
-    addCredits(0); // no-op for owner
-    // In a real backend, we'd credit the tester. For demo, if approving other's feedback while signed in as owner, also increment owner's credits to visualize flow
-    toast({ title: "Feedback approved", description: `Transferred ${test.reward} credits.` });
+  const approveFeedback: AppContextValue["approveFeedback"] = async (feedbackId) => {
+    const { error } = await supabase.from("submissions").update({ status: 'approved' }).eq('id', feedbackId);
+    if (error) toast.error(error.message); else toast.success("Feedback approved");
   };
 
-  const value = useMemo(
-    () => ({ user, credits, tests, feedbacks, loginDemo, logout, addCredits, deductCredits, postTest, submitFeedback, approveFeedback }),
-    [user, credits, tests, feedbacks]
-  );
+  const refreshProfile = async () => {
+    const { data: s } = await supabase.auth.getSession();
+    const uid = s.session?.user?.id;
+    if (uid) await fetchProfile(uid);
+  };
+
+  const value = useMemo(() => ({
+    user, credits, tests, feedbacks, logout, postTest, submitFeedback, approveFeedback, refreshProfile,
+  }), [user, credits, tests, feedbacks]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };

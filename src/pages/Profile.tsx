@@ -1,5 +1,6 @@
 import { Helmet } from "react-helmet-async";
 import { useApp } from "@/context/AppContext";
+import { Link } from "react-router-dom";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,7 +10,7 @@ import { useMemo, useState } from "react";
 import TestCard from "@/components/tests/TestCard";
 
 const Profile = () => {
-  const { user, credits, tests, feedbacks, loginDemo } = useApp();
+  const { user, credits, tests, feedbacks } = useApp();
   const [buyOpen, setBuyOpen] = useState(false);
 
   const myPosted = useMemo(()=> tests.filter((t)=> t.ownerId === user?.id), [tests, user?.id]);
@@ -33,7 +34,7 @@ const Profile = () => {
         </div>
         <div className="flex items-center gap-2">
           <Button variant="secondary" onClick={()=> setBuyOpen(true)}>Buy Credits</Button>
-          {!user && <Button onClick={loginDemo}>Login</Button>}
+          {!user && <Button asChild><Link to="/auth">Login</Link></Button>}
         </div>
       </div>
 
