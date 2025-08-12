@@ -11,7 +11,8 @@ import TestDetail from "@/pages/TestDetail";
 import Profile from "@/pages/Profile";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import Auth from "@/pages/Auth";
+import Login from "@/pages/Login";
+import Signup from "@/pages/Signup";
 import PaymentSuccess from "@/pages/PaymentSuccess";
 import PaymentCanceled from "@/pages/PaymentCanceled";
 import { AppProvider } from "@/context/AppContext";
@@ -33,7 +34,9 @@ const App = () => (
                 <Route path="/post" element={<PostTest />} />
                 <Route path="/test/:id" element={<TestDetail />} />
                 <Route path="/profile" element={<Profile />} />
-                <Route path="/auth" element={<Auth />} />
+                 <Route path="/login" element={<Login />} />
+                 <Route path="/signup" element={<Signup />} />
+                 <Route path="/auth" element={<Login />} />
                 <Route path="/payment-success" element={<PaymentSuccess />} />
                 <Route path="/payment-canceled" element={<PaymentCanceled />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
