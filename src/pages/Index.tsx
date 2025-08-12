@@ -6,10 +6,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, CarouselApi } from "@/components/ui/carousel";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useApp } from "@/context/AppContext";
-import { Clock, Coins, Rocket, MousePointerClick, Megaphone, UserRound } from "lucide-react";
+import { Clock, Coins, MousePointerClick, Megaphone, UserRound } from "lucide-react";
+import BuyCreditsModal from "@/components/credits/BuyCreditsModal";
 
 // Utilities
 const useCountUp = (to: number, duration = 1200) => {
@@ -124,6 +125,9 @@ const Index = () => {
   const navigate = useNavigate();
   const { tests } = useApp();
   const [signupOpen, setSignupOpen] = useState(false);
+  const [buyOpen, setBuyOpen] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const [testsCarouselApi, setTestsCarouselApi] = useState<CarouselApi | null>(null);
 
   // Live counters (simple demo logic using existing data)
   const testsTodayTarget = Math.max(3, tests.length);
@@ -153,6 +157,16 @@ const Index = () => {
     });
   }, [tests, timeFilter]);
 
+  // Auto-scroll tests carousel leftwards with pause on hover
+  useEffect(() => {
+    if (!testsCarouselApi) return;
+    if (paused) return;
+    const id = setInterval(() => {
+      testsCarouselApi.scrollNext();
+    }, 2500);
+    return () => clearInterval(id);
+  }, [testsCarouselApi, paused]);
+
   // Sticky CTA visibility (hide when near bottom footer)
   const [showSticky, setShowSticky] = useState(true);
   useEffect(() => {
@@ -177,7 +191,7 @@ const Index = () => {
 
       {/* Hero */}
       <header className="container py-12 md:py-20">
-        <div className="grid md:grid-cols-2 gap-8 items-center">
+        <div className="grid md:grid-cols-1 gap-8 items-center">
           {/* Left copy */}
           <div className="space-y-6 animate-fade-in">
             <h1 className="text-4xl md:text-5xl font-semibold tracking-tight">
@@ -190,36 +204,18 @@ const Index = () => {
               <Button onClick={() => setSignupOpen(true)} className="hover-scale shadow" aria-label="Start Testing">
                 Start Testing
               </Button>
+              <span className="text-xs text-muted-foreground text-center sm:px-2">
+                New users get 20 free credits — limited time.
+              </span>
               <Button variant="outline" onClick={() => setSignupOpen(true)} aria-label="Post Your First Test">
                 Post Your First Test
               </Button>
             </div>
-            <p className="text-xs text-muted-foreground">New users get 20 free credits — limited time.</p>
+            <div className="text-xs text-muted-foreground">
+              <button onClick={() => setBuyOpen(true)} className="underline underline-offset-4">Buy credits</button>
+            </div>
           </div>
 
-          {/* Right visual carousel */}
-          <div className="hidden md:block">
-            <Carousel className="w-full">
-              <CarouselContent>
-                {[1, 2, 3].map((i) => (
-                  <CarouselItem key={i} className="basis-full">
-                    <Card className="hover-scale transition-shadow shadow-sm">
-                      <CardContent className="p-8 flex flex-col items-center justify-center h-64">
-                        <Rocket className="h-10 w-10 mb-4" />
-                        <p className="text-muted-foreground text-center max-w-sm">
-                          Ship faster with quick, actionable feedback from real testers.
-                        </p>
-                      </CardContent>
-                    </Card>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <div className="flex items-center justify-between mt-3">
-                <CarouselPrevious className="static translate-x-0" />
-                <CarouselNext className="static translate-x-0" />
-              </div>
-            </Carousel>
-          </div>
         </div>
       </header>
 
@@ -291,7 +287,7 @@ const Index = () => {
           </div>
 
           {/* Carousel of tests */}
-          <Carousel className="w-full">
+          <Carousel className="w-full" opts={{ loop: true }} setApi={setTestsCarouselApi} onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
             <CarouselContent className="-ml-2">
               {filtered.slice(0, 12).map((t: any) => (
                 <CarouselItem key={t.id} className="pl-2 basis-3/4 sm:basis-1/2 lg:basis-1/3">
@@ -400,6 +396,7 @@ const Index = () => {
 
       {/* Modals */}
       <QuickSignupModal open={signupOpen} onOpenChange={setSignupOpen} />
+      <BuyCreditsModal open={buyOpen} onOpenChange={setBuyOpen} />
     </div>
   );
 };
