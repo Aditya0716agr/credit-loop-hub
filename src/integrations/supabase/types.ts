@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "13.0.4"
@@ -79,6 +79,186 @@ export type Database = {
           },
           {
             foreignKeyName: "credit_transactions_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "test_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      form_questions: {
+        Row: {
+          created_at: string
+          description: string | null
+          form_id: string
+          id: string
+          options: Json | null
+          order_index: number
+          required: boolean
+          title: string
+          type: string
+          validation: Json | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          form_id: string
+          id?: string
+          options?: Json | null
+          order_index?: number
+          required?: boolean
+          title: string
+          type: string
+          validation?: Json | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          form_id?: string
+          id?: string
+          options?: Json | null
+          order_index?: number
+          required?: boolean
+          title?: string
+          type?: string
+          validation?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_questions_form_id_fkey"
+            columns: ["form_id"]
+            isOneToOne: false
+            referencedRelation: "forms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      form_response_answers: {
+        Row: {
+          answer_data: Json | null
+          answer_text: string | null
+          created_at: string
+          id: string
+          question_id: string
+          response_id: string
+        }
+        Insert: {
+          answer_data?: Json | null
+          answer_text?: string | null
+          created_at?: string
+          id?: string
+          question_id: string
+          response_id: string
+        }
+        Update: {
+          answer_data?: Json | null
+          answer_text?: string | null
+          created_at?: string
+          id?: string
+          question_id?: string
+          response_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_response_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "form_questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "form_response_answers_response_id_fkey"
+            columns: ["response_id"]
+            isOneToOne: false
+            referencedRelation: "form_responses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      form_responses: {
+        Row: {
+          form_id: string
+          id: string
+          ip_address: string | null
+          metadata: Json | null
+          respondent_id: string | null
+          submitted_at: string
+        }
+        Insert: {
+          form_id: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          respondent_id?: string | null
+          submitted_at?: string
+        }
+        Update: {
+          form_id?: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          respondent_id?: string | null
+          submitted_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_responses_form_id_fkey"
+            columns: ["form_id"]
+            isOneToOne: false
+            referencedRelation: "forms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      forms: {
+        Row: {
+          branding: Json | null
+          created_at: string
+          creator_id: string
+          credits_per_response: number
+          description: string | null
+          id: string
+          response_count: number
+          settings: Json | null
+          status: string
+          test_id: string | null
+          title: string
+          updated_at: string
+          visibility: string
+        }
+        Insert: {
+          branding?: Json | null
+          created_at?: string
+          creator_id: string
+          credits_per_response?: number
+          description?: string | null
+          id?: string
+          response_count?: number
+          settings?: Json | null
+          status?: string
+          test_id?: string | null
+          title: string
+          updated_at?: string
+          visibility?: string
+        }
+        Update: {
+          branding?: Json | null
+          created_at?: string
+          creator_id?: string
+          credits_per_response?: number
+          description?: string | null
+          id?: string
+          response_count?: number
+          settings?: Json | null
+          status?: string
+          test_id?: string | null
+          title?: string
+          updated_at?: string
+          visibility?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forms_test_id_fkey"
             columns: ["test_id"]
             isOneToOne: false
             referencedRelation: "test_requests"
@@ -332,23 +512,23 @@ export type Database = {
     }
     Functions: {
       adjust_user_credits: {
-        Args: { _user_id: string; _delta: number }
+        Args: { _delta: number; _user_id: string }
         Returns: undefined
       }
       log_credit_tx: {
         Args: {
-          _user_id: string
           _amount: number
           _direction: Database["public"]["Enums"]["tx_direction"]
-          _reason: Database["public"]["Enums"]["tx_reason"]
-          _test_id?: string
           _feedback_id?: string
           _metadata?: Json
+          _reason: Database["public"]["Enums"]["tx_reason"]
+          _test_id?: string
+          _user_id: string
         }
         Returns: undefined
       }
       notify: {
-        Args: { _user_id: string; _type: string; _payload: Json }
+        Args: { _payload: Json; _type: string; _user_id: string }
         Returns: undefined
       }
     }
