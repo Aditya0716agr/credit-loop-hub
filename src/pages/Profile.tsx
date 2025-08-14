@@ -26,15 +26,24 @@ const Profile = () => {
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Avatar className="h-12 w-12"><AvatarFallback>{(user?.name ?? "U").slice(0,2).toUpperCase()}</AvatarFallback></Avatar>
+          <Avatar className="h-12 w-12">
+            <AvatarFallback>
+              {(user?.name ?? "U").slice(0,2).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
           <div>
-            <div className="text-xl font-medium">{user?.name ?? "Guest"}</div>
-            <div className="text-sm text-muted-foreground">Credits: <span className="font-medium text-foreground">{credits}</span></div>
+            <div className="text-xl font-medium">{user?.name || "Guest"}</div>
+            {user?.bio && (
+              <div className="text-sm text-muted-foreground max-w-md">{user.bio}</div>
+            )}
+            <div className="text-sm text-muted-foreground mt-1">
+              Credits: <span className="font-medium text-foreground">{credits}</span>
+            </div>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="secondary" onClick={()=> setBuyOpen(true)}>Buy Credits</Button>
-          {!user && <Button asChild><Link to="/auth">Login</Link></Button>}
+          {!user && <Button asChild><Link to="/login">Login</Link></Button>}
         </div>
       </div>
 
