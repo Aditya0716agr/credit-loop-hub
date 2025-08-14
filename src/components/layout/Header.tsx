@@ -18,6 +18,7 @@ const Header = () => {
           <nav className="hidden md:flex items-center gap-4 text-sm text-muted-foreground">
             <NavLink to="/hub" className={({isActive})=> isActive?"text-foreground":"hover:text-foreground"}>Testing Hub</NavLink>
             <NavLink to="/post" className={({isActive})=> isActive?"text-foreground":"hover:text-foreground"}>Post a Test</NavLink>
+            <NavLink to="/forms" className={({isActive})=> isActive?"text-foreground":"hover:text-foreground"}>Forms</NavLink>
             <NavLink to="/profile" className={({isActive})=> isActive?"text-foreground":"hover:text-foreground"}>Profile</NavLink>
           </nav>
         </div>

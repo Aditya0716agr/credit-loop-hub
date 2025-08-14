@@ -9,6 +9,8 @@ import TestingHub from "@/pages/TestingHub";
 import PostTest from "@/pages/PostTest";
 import TestDetail from "@/pages/TestDetail";
 import Profile from "@/pages/Profile";
+import Forms from "@/pages/Forms";
+import CreateForm from "@/pages/CreateForm";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Login from "@/pages/Login";
@@ -34,6 +36,8 @@ const App = () => (
                 <Route path="/post" element={<PostTest />} />
                 <Route path="/test/:id" element={<TestDetail />} />
                 <Route path="/profile" element={<Profile />} />
+                <Route path="/forms" element={<Forms />} />
+                <Route path="/forms/create" element={<CreateForm />} />
                  <Route path="/login" element={<Login />} />
                  <Route path="/signup" element={<Signup />} />
                  <Route path="/auth" element={<Login />} />
