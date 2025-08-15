@@ -241,6 +241,20 @@ const Index = () => {
                 <span>20 Free Credits</span>
               </div>
             </div>
+            
+            <div className="text-center">
+              <p className="text-xs text-muted-foreground">
+                by{" "}
+                <a 
+                  href="https://www.ideasoop.online/" 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="hover:text-foreground underline underline-offset-2 transition-colors"
+                >
+                  ideasoop labs
+                </a>
+              </p>
+            </div>
           </div>
 
         </div>
