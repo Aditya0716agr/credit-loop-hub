@@ -14,7 +14,7 @@ const Header = () => {
     <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center justify-between">
         <div className="flex items-center gap-6">
-          <Link to="/" className="font-semibold tracking-tight">IdeaSoop Beta Hub</Link>
+          <Link to="/" className="font-semibold tracking-tight">Refi</Link>
           <nav className="hidden md:flex items-center gap-4 text-sm text-muted-foreground">
             <NavLink to="/hub" className={({isActive})=> isActive?"text-foreground":"hover:text-foreground"}>Testing Hub</NavLink>
             <NavLink to="/post" className={({isActive})=> isActive?"text-foreground":"hover:text-foreground"}>Post a Test</NavLink>

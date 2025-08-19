@@ -19,7 +19,7 @@ const Profile = () => {
   return (
     <div className="container py-10 space-y-8">
       <Helmet>
-        <title>Profile — IdeaSoop Beta Hub</title>
+        <title>Profile — Refi</title>
         <meta name="description" content="View your profile, credit balance, and activity." />
         <link rel="canonical" href="/profile" />
       </Helmet>

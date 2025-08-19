@@ -22,7 +22,7 @@ const TestingHub = () => {
   return (
     <div className="container py-10 space-y-8">
       <Helmet>
-        <title>Testing Hub — IdeaSoop Beta Hub</title>
+        <title>Testing Hub — Refi</title>
         <meta name="description" content="Browse active beta tests and earn credits by helping founders." />
         <link rel="canonical" href="/hub" />
       </Helmet>

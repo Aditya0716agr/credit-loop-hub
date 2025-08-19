@@ -3,7 +3,7 @@ const Footer = () => {
     <footer className="border-t mt-16">
       <div className="container py-8 text-sm text-muted-foreground flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="text-center md:text-left">
-          <p>© {new Date().getFullYear()} IdeaSoop Beta Hub</p>
+          <p>© {new Date().getFullYear()} Refi</p>
           <p className="text-xs mt-1">
             by{" "}
             <a 

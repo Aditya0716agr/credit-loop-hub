@@ -192,7 +192,7 @@ const Index = () => {
       </div>
 
       <Helmet>
-        <title>IdeaSoop Beta — Get Tested Fast</title>
+        <title>Refi — Get Tested Fast</title>
         <meta name="description" content="Post tests, get real feedback, and earn credits. Minimal, fast, and focused." />
         <link rel="canonical" href="/" />
       </Helmet>
@@ -347,9 +347,8 @@ const Index = () => {
           <div className="grid md:grid-cols-3 gap-8">
             {[{
               t: "Post a Test",
-              d: "Create a brief, set time and credit reward. Define what you need tested.",
-              I: Megaphone,
-              step: "01"
+              d: "Create a brief, set time and credit reward.",
+              I: Megaphone
             }, {
               t: "Get Real Feedback", 
               d: "Testers complete your tasks and submit detailed feedback within hours.",
@@ -404,7 +403,7 @@ const Index = () => {
                     title={t.title}
                     reward={Number(t.reward) || 0}
                     time={coerceMinutes(t.timeRequired)}
-                    meta={`Posted recently • ${t.testersNeeded ? t.testersNeeded : 3} testers needed`}
+                    meta={`Posted recently • ${(t.maxTesters ?? (coerceMinutes(t.timeRequired) <= 10 ? 3 : (coerceMinutes(t.timeRequired) <= 20 ? 5 : 10)))} testers needed`}
                     onTry={() => navigate(`/test/${t.id}`)}
                   />
                 </CarouselItem>
@@ -420,7 +419,7 @@ const Index = () => {
         {/* Enhanced Benefits Section */}
         <section ref={benefitsIn.ref} className="container">
           <div className="text-center space-y-4 mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Why Choose IdeaSoop?</h2>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Why Choose Refi?</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               The fastest way to validate ideas and connect with your target audience.
             </p>

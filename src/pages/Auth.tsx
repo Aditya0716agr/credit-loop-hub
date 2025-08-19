@@ -45,7 +45,7 @@ const Auth = () => {
   return (
     <div className="container py-10 max-w-md">
       <Helmet>
-        <title>Login or Sign Up — IdeaSoop</title>
+        <title>Login or Sign Up — Refi</title>
         <meta name="description" content="Login or create an account to post tests and earn credits." />
         <link rel="canonical" href="/auth" />
       </Helmet>

@@ -25,6 +25,7 @@ export interface TestRequest {
   ownerId: string;
   createdAt: string;
   status: "active" | "closed";
+  maxTesters?: number;
 }
 
 export interface Feedback {
@@ -69,6 +70,7 @@ export const AppProvider: React.FC<React.PropsWithChildren> = ({ children }) => 
     ownerId: r.owner_id,
     createdAt: r.created_at,
     status: r.status,
+    maxTesters: r.max_testers ?? undefined,
   });
 
   const mapFeedback = (r: any): Feedback => ({
@@ -157,7 +159,6 @@ export const AppProvider: React.FC<React.PropsWithChildren> = ({ children }) => 
       link: input.link,
       nda: !!input.nda,
       owner_id: uid,
-      max_testers: 1,
     };
 
     const { data, error } = await supabase.from("test_requests").insert(insert).select("*").maybeSingle();
