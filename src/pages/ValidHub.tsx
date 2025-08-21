@@ -10,7 +10,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import BuyCreditsModal from "@/components/credits/BuyCreditsModal";
 
-const PostTest = () => {
+const ValidHub = () => {
   const { user, credits, postTest } = useApp();
   const [buyOpen, setBuyOpen] = useState(false);
   const navigate = useNavigate();
@@ -43,13 +43,86 @@ const PostTest = () => {
   return (
     <div className="container py-10 space-y-8">
       <Helmet>
-        <title>Post a Test — Refi</title>
-        <meta name="description" content="Publish a beta test request and reward testers with credits." />
-        <link rel="canonical" href="/post" />
+        {/* Primary Meta Tags */}
+        <title>ValidHub — Post Beta Test Requests | Refi</title>
+        <meta name="title" content="ValidHub — Post Beta Test Requests | Refi" />
+        <meta name="description" content="Create and publish beta test requests on ValidHub. Connect with qualified testers, validate your product ideas, and get valuable user feedback. Start testing your website, app, or service flow today." />
+        <meta name="keywords" content="beta testing, user testing, product validation, user feedback, website testing, app testing, service testing, product development, user research, UX testing" />
+        <meta name="author" content="Refi" />
+        <meta name="robots" content="index, follow" />
+        <meta name="language" content="English" />
+        <meta name="revisit-after" content="7 days" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        
+        {/* Canonical URL */}
+        <link rel="canonical" href="/validhub" />
+        
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="/validhub" />
+        <meta property="og:title" content="ValidHub — Post Beta Test Requests | Refi" />
+        <meta property="og:description" content="Create and publish beta test requests on ValidHub. Connect with qualified testers, validate your product ideas, and get valuable user feedback." />
+        <meta property="og:image" content="/og-validhub.jpg" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:site_name" content="Refi" />
+        <meta property="og:locale" content="en_US" />
+        
+        {/* Twitter */}
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content="/validhub" />
+        <meta property="twitter:title" content="ValidHub — Post Beta Test Requests | Refi" />
+        <meta property="twitter:description" content="Create and publish beta test requests on ValidHub. Connect with qualified testers, validate your product ideas, and get valuable user feedback." />
+        <meta property="twitter:image" content="/og-validhub.jpg" />
+        
+        {/* Additional Meta Tags */}
+        <meta name="theme-color" content="#000000" />
+        <meta name="msapplication-TileColor" content="#000000" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        
+        {/* Structured Data */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "ValidHub — Post Beta Test Requests",
+            "description": "Create and publish beta test requests on ValidHub. Connect with qualified testers, validate your product ideas, and get valuable user feedback.",
+            "url": "/validhub",
+            "mainEntity": {
+              "@type": "Service",
+              "name": "Beta Testing Platform",
+              "description": "Platform for posting beta test requests and connecting with testers",
+              "provider": {
+                "@type": "Organization",
+                "name": "Refi"
+              },
+              "serviceType": "Beta Testing",
+              "areaServed": "Worldwide"
+            },
+            "breadcrumb": {
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "position": 1,
+                  "name": "Home",
+                  "item": "/"
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 2,
+                  "name": "ValidHub",
+                  "item": "/validhub"
+                }
+              ]
+            }
+          })}
+        </script>
       </Helmet>
 
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-semibold tracking-tight">Post Test Request</h1>
+        <h1 className="text-3xl font-semibold tracking-tight">ValidHub — Post Test Request</h1>
         <div className="text-sm text-muted-foreground">Credit balance: <span className="font-medium text-foreground">{credits}</span></div>
       </div>
 
@@ -143,4 +216,4 @@ const PostTest = () => {
   );
 };
 
-export default PostTest;
+export default ValidHub;
