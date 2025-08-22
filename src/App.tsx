@@ -17,6 +17,7 @@ import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
 import PaymentSuccess from "@/pages/PaymentSuccess";
 import PaymentCanceled from "@/pages/PaymentCanceled";
+import SEO from "@/pages/SEO";
 import { AppProvider } from "@/context/AppContext";
 
 const queryClient = new QueryClient();
@@ -38,11 +39,12 @@ const App = () => (
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/forms" element={<Forms />} />
                 <Route path="/forms/create" element={<CreateForm />} />
-                 <Route path="/login" element={<Login />} />
-                 <Route path="/signup" element={<Signup />} />
-                 <Route path="/auth" element={<Login />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/auth" element={<Login />} />
                 <Route path="/payment-success" element={<PaymentSuccess />} />
                 <Route path="/payment-canceled" element={<PaymentCanceled />} />
+                <Route path="/seo" element={<SEO />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
